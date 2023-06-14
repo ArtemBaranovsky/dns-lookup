@@ -32,12 +32,11 @@ class DnsLookup
             $dnsResolver = $this->dnsResolverFactory->createDnsResolver($outputFormatter);
             $dnsRecords = $dnsResolver->resolve($domain);
 
-            return $this->formatDnsRecords($dnsRecords, $format);
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
-
-            throw $e;
         }
+
+        return $this->formatDnsRecords($dnsRecords, $format);
     }
 
     private function createOutputFormatter(string $format): OutputFormatterInterface
