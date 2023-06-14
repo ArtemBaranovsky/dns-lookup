@@ -1,13 +1,12 @@
 <?php
 
-namespace ArtemBaranovskyi\DnsLookup;
+namespace ArtemBaranovskyi\DnsLookup\Exceptions;
 
 use Exception;
 use Throwable;
 
 class InvalidOutputFormatException extends Exception
 {
-
     /**
      * @param $message
      * @param $code

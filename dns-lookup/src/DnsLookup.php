@@ -3,66 +3,60 @@
 namespace ArtemBaranovskyi\DnsLookup;
 
 use ArtemBaranovskyi\DnsLookup\Collections\DnsRecordCollection;
-use ArtemBaranovskyi\DnsLookup\Exceptions\DnsQueryException;
-use ArtemBaranovskyi\DnsLookup\Exceptions\InvalidDomainException;
-use ArtemBaranovskyi\DnsLookup\Models\DnsRecord;
+use ArtemBaranovskyi\DnsLookup\Factories\DnsResolverFactoryInterface;
+use ArtemBaranovskyi\DnsLookup\Formatters\ArrayOutputFormatter;
+use ArtemBaranovskyi\DnsLookup\Formatters\DnsRecordCollectionOutputFormatter;
+use ArtemBaranovskyi\DnsLookup\Formatters\JsonOutputFormatter;
+use ArtemBaranovskyi\DnsLookup\Formatters\OutputFormatterInterface;
 use Exception;
-use Monolog\Logger;
-use Psr\Log\LogLevel;
-use Monolog\Handler\StreamHandler;
+use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+
+
 
 class DnsLookup
 {
+    public function __construct(
+        private DnsResolverFactoryInterface $dnsResolverFactory,
+        private LoggerInterface $logger,
+    ) {
+    }
+
     /**
-     * @param string $domain
-     * @return DnsRecordCollection | array
      * @throws Exception
      */
-    public function getDnsRecords(string $domain, string $type = 'array'): DnsRecordCollection | array
+    public function getDnsRecords(string $domain, string $format = 'array'): DnsRecordCollection | array | string | bool
     {
-        $logger = new Logger('dns-lookup');
-        $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/error.log', LogLevel::ERROR));
-
         try {
-            if (! in_array($type, ['array', 'collection'])) {
-                throw new InvalidOutputFormatException("Wrong output format provided");
-            }
+            $outputFormatter = $this->createOutputFormatter($format);
+            $dnsResolver = $this->dnsResolverFactory->createDnsResolver($outputFormatter);
+            $dnsRecords = $dnsResolver->resolve($domain);
 
-            if (empty($domain)) {
-                throw new InvalidDomainException("Domain name is required");
-            }
-
-            if (!filter_var($domain, FILTER_VALIDATE_DOMAIN)) {
-                throw new InvalidDomainException("Provided domain name is incorrect");
-            }
-
-            $dnsRecords = dns_get_record($domain, DNS_ANY);
-            if ($dnsRecords === false) {
-                throw new DnsQueryException("DNS query failed");
-            }
-
-            $collection = new DnsRecordCollection();
-            foreach ($dnsRecords as $record) {
-                $collection->add(new DnsRecord(
-                    $record["type"],
-                    $record["host"],
-                    $record["ttl"],
-                    $record["txt"] ?? $record["ip"] ?? null
-                ));
-            }
-
-        } catch (InvalidOutputFormatException $e) {
-            $logger->error('Wrong result format provided: ' . $e->getMessage());
-        } catch (InvalidDomainException $e) {
-            $logger->error('Invalid domain name $domain: ' . $e->getMessage());
-        } catch (DnsQueryException $e) {
-            $logger->error('DNS query to $domain failed: ' . $e->getMessage());
+            return $this->formatDnsRecords($dnsRecords, $format);
         } catch (Exception $e) {
-            $logger->error('An error occurred: ' . $e->getMessage());
+            $this->logger->error($e->getMessage());
+
+            throw $e;
         }
+    }
 
-//        print_r($collection->toArray());
+    private function createOutputFormatter(string $format): OutputFormatterInterface
+    {
+        return match ($format) {
+            'array' => new ArrayOutputFormatter(),
+            'collection' => new DnsRecordCollectionOutputFormatter(),
+            'json' => new JsonOutputFormatter(),
+            default => throw new InvalidArgumentException('Invalid output format specified'),
+        };
+    }
 
-        return ($type == 'collection') ? $collection : $collection->toArray();
+    private function formatDnsRecords(DnsRecordCollection $dnsRecords, string $format): DnsRecordCollection | array | string | bool
+    {
+        return match ($format) {
+            'array' => $dnsRecords->toArray(),
+            'collection' => $dnsRecords,
+            'json' => json_encode($dnsRecords->toArray()),
+            default => throw new InvalidArgumentException('Invalid output format specified'),
+        };
     }
 }
