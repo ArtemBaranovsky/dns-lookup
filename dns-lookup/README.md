@@ -2,6 +2,10 @@
 
 The DnsLookup library is a PHP package that provides DNS lookup functionality. It allows you to retrieve DNS records for a given domain name in various output formats.
 
+## Requirements & Dependencies
+    "php": "^8.2",
+    "monolog/monolog": "^3.3"
+
 ## Installation
 
 You can install the library using Composer. Run the following command in your project directory:
