@@ -4,7 +4,7 @@ The DnsLookup library is a PHP package that provides DNS lookup functionality. I
 
 ## Requirements & Dependencies
     "php": "^8.2",
-    "monolog/monolog": "^2.0"
+    "monolog/monolog": "^3.0"
 
 ## Installation
 
