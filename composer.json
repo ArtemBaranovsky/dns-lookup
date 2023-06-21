@@ -8,8 +8,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "*",
-        "monolog/monolog": "^2.0",
-        "artembaranovskyi/dns-lookup": "^1.0"
+        "monolog/monolog": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -40,5 +39,4 @@
             "url": "https://github.com/ArtemBaranovsky/dns-lookup"
         }
     ]
-
 }
