@@ -13,6 +13,14 @@ You can install the library using Composer. Run the following command in your pr
 ```php
 composer require artembaranovskyi/dns-lookup
 ```
+Then add package Service Provider to autoload in config/app.php:
+```php
+        /*
+         * Package Service Providers...
+         */
+        DnsLookupServiceProvider::class,
+```
+
 ## Usage
 To use the DnsLookup library, follow these steps:
 

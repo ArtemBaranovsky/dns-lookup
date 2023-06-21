@@ -2,7 +2,6 @@
 
 namespace ArtemBaranovskyi\DnsLookup;
 
-use ArtemBaranovskyi\DnsLookup\Facades\DnsLookupFacade;
 use ArtemBaranovskyi\DnsLookup\Factories\DnsResolverFactory;
 use Illuminate\Support\ServiceProvider;
 use Psr\Log\LoggerInterface;
