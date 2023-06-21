@@ -47,7 +47,7 @@ use RuntimeException;
     public function resolve(string $domain, string $format = 'array'): bool | DnsRecordCollection | array | string
     {
         try {
-            if (!in_array($format, ['array', 'collection'])) {
+            if (!in_array($format, ['array', 'collection', 'json'])) {
                 throw new InvalidOutputFormatException("Wrong output format provided");
             }
 
