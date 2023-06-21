@@ -11,7 +11,6 @@ use ArtemBaranovskyi\DnsLookup\Formatters\OutputFormatterInterface;
 use ArtemBaranovskyi\DnsLookup\Models\DnsRecord;
 use Exception;
 use Monolog\Handler\StreamHandler;
-use Monolog\Level;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -35,7 +34,7 @@ use RuntimeException;
             $logPath = $logDirectory . '/dns_resolver.log';
 
             $this->logger = new Logger('dns_resolver');
-            $handler = new StreamHandler($logPath, Level::Info);
+            $handler = new StreamHandler($logPath, Logger::INFO);
             $this->logger->pushHandler($handler);
         }
     }

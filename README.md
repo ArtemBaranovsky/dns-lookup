@@ -11,7 +11,7 @@ The DnsLookup library is a PHP package that provides DNS lookup functionality. I
 You can install the library using Composer. Run the following command in your project directory:
 
 ```php
-composer require artembaranovskyi/dns-lookup
+composer require artem-baranovskyi/dns-lookup
 ```
 Then add package Service Provider to autoload in config/app.php:
 ```php
@@ -19,48 +19,41 @@ Then add package Service Provider to autoload in config/app.php:
          * Package Service Providers...
          */
         DnsLookupServiceProvider::class,
+``````
+Also add package alias at Class Aliases section:
+```php
+    'aliases' => Facade::defaultAliases()->merge([
+        'DnsLookup' => ArtemBaranovskyi\DnsLookup\Facades\DnsLookupFacade::class,
+    ])->toArray(),
 ```
 
 ## Usage
-To use the DnsLookup library, follow these steps:
+To use the DnsLookup library, you can follow these options:
 
-1. Include the Composer autoloader in your PHP script:
+1. Use DnsLookup as a facade, providing desired output format:
 ```php
-require 'vendor/autoload.php';
+use ArtemBaranovskyi\DnsLookup\Facades\DnsLookupFacade;
+...
+    $domain = 'example.com';
+    $dnsRecords = DnsLookupFacade::getDnsRecords($domain, 'array'); // use any from 'array', 'collection', 'json'
+    dd($dnsRecords);
 ```
-2. Create an instance of the DnsLookup class, providing the required dependencies:
+
+2. Get an instance of DnsLookup form Service Container, providing desired output format:
+
 ```php
-use ArtemBaranovskyi\DnsLookup\DnsLookup;
-use ArtemBaranovskyi\DnsLookup\Factories\DnsResolverFactory;
-use ArtemBaranovskyi\DnsLookup\Formatters\ArrayOutputFormatter;
-use Psr\Log\NullLogger;
+use ArtemBaranovskyi\DnsLookup\Facades\DnsLookupFacade;
 
-// Create a DnsResolverFactory instance
-$dnsResolverFactory = new DnsResolverFactory();
-
-// Create a logger (in this example, we're using NullLogger)
-$logger = new NullLogger();
-
-// Create an instance of DnsLookup
-$dnsLookup = new DnsLookup($dnsResolverFactory, $logger);
-```
-3. Call the getDnsRecords method to retrieve DNS records:
-```php
-// Specify the domain and output format
-$domain = 'example.com';
-$format = 'array'; // Available formats: 'array', 'collection', 'json'
-
-// Get the DNS records
-$dnsRecords = $dnsLookup->getDnsRecords($domain, $format);
-
-// Use the DNS records as needed
-var_dump($dnsRecords);
+    $domain = 'example.com';
+    $dnsLookup = app(DnsLookup::class);
+    $dnsRecords = $dnsLookup->getDnsRecords($domain, 'array'); // use any from 'array', 'collection', 'json'
+    dd($dnsRecords);
 ```
 
 ## Available Output Formats
 The getDnsRecords method accepts a format parameter, which determines the output format of the DNS records. The following formats are supported:
 
-    array: Returns an array of DNS records.
+    array: Returns an array of DNS records (default format)
     collection: Returns a DnsRecordCollection object containing the DNS records.
     json: Returns a JSON-encoded string of the DNS records.
 

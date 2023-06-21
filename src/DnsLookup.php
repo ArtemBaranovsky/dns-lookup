@@ -13,10 +13,10 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 class DnsLookup
 {    public function __construct(
-        private DnsResolverFactoryInterface $dnsResolverFactory,
-        private LoggerInterface $logger,
-    ) {
-    }
+    private DnsResolverFactoryInterface $dnsResolverFactory,
+    private LoggerInterface $logger,
+) {
+}
 
     /**
      * @param string $domain
@@ -25,16 +25,16 @@ class DnsLookup
      */
     public function getDnsRecords(string $domain, string $format = 'array'): DnsRecordCollection | array | string | bool
     {
+        $outputFormatter = $this->createOutputFormatter($format);
+
         try {
-            $outputFormatter = $this->createOutputFormatter($format);
             $dnsResolver = $this->dnsResolverFactory->createDnsResolver($outputFormatter);
             $dnsRecords = $dnsResolver->resolve($domain);
 
-        } catch (Exception $e) {
+        } catch (Exception | InvalidArgumentException $e) {
             $this->logger->error($e->getMessage());
         }
-
-        return $this->formatDnsRecords($dnsRecords, $format);
+        return $dnsRecords;
     }
 
     /**
@@ -43,26 +43,14 @@ class DnsLookup
      */
     private function createOutputFormatter(string $format): OutputFormatterInterface
     {
+        if (! in_array($format, ['array', 'collection', 'json'])) {
+            throw new InvalidArgumentException('Invalid output format specified');
+        }
+
         return match ($format) {
             'array' => new ArrayOutputFormatter(),
             'collection' => new DnsRecordCollectionOutputFormatter(),
             'json' => new JsonOutputFormatter(),
-            default => throw new InvalidArgumentException('Invalid output format specified'),
-        };
-    }
-
-    /**
-     * @param DnsRecordCollection $dnsRecords
-     * @param string $format
-     * @return DnsRecordCollection|array|string|bool
-     */
-    private function formatDnsRecords(DnsRecordCollection $dnsRecords, string $format): DnsRecordCollection | array | string | bool
-    {
-        return match ($format) {
-            'array' => $dnsRecords->toArray(),
-            'collection' => $dnsRecords,
-            'json' => json_encode($dnsRecords->toArray()),
-            default => throw new InvalidArgumentException('Invalid output format specified'),
         };
     }
 }
