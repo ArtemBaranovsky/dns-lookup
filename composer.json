@@ -2,7 +2,7 @@
     "name": "artem-baranovskyi/dns-lookup",
     "description": "This test standalone Laravel library allows to get all DNS records for the specified domain name.",
     "keywords": ["dns","dns-lookup"],
-    "version": "1.0.1",
+    "version": "1.0.2",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "stable",
