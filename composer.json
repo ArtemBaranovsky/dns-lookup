@@ -7,7 +7,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^9.0 || ^10.0",
+        "laravel/framework": "*",
         "monolog/monolog": "^2.0",
         "artembaranovskyi/dns-lookup": "^1.0"
     },
