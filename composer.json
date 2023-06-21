@@ -33,5 +33,12 @@
                 "DnsLookup": "ArtemBaranovskyi\\DnsLookup\\Facades\\DnsLookupFacade"
             }
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ArtemBaranovsky/dns-lookup"
+        }
+    ]
+
 }
